@@ -27,6 +27,18 @@ def bootstrap_macro_f1(actual, predictions, match_ids, classes, repeats=1000, se
         index = group * n_classes + predicted
         blocks.append(np.bincount(index, minlength=n_groups * n_classes).reshape(n_groups, n_classes))
         blocks.append(np.bincount(index[truth == predicted], minlength=n_groups * n_classes).reshape(n_groups, n_classes))
+    return bootstrap_from_counts(support, {
+        name: (blocks[2 * i + 1], blocks[2 * i + 2])
+        for i, name in enumerate(predictions)
+    }, repeats, seed)
+
+
+def bootstrap_from_counts(support, predictions, repeats=1000, seed=SEED):
+    """Resample matches from per-class actual, predicted and true-positive counts."""
+    n_groups, n_classes = support.shape
+    if n_groups < 2 or not predictions or repeats < 2:
+        raise ValueError('Bootstrap requires at least two matches and repetitions, and one model')
+    blocks = [support, *(block for pair in predictions.values() for block in pair)]
     counts = np.concatenate(blocks, axis=1).astype(float)
     rng = np.random.default_rng(seed)
     draws = []

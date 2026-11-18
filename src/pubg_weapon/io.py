@@ -17,11 +17,11 @@ TEXT_COLUMNS = ('killed_by', 'killer_name', 'victim_name', 'map', 'match_id')
 
 
 def write_json(path, value):
-    Path(path).write_text(json.dumps(value, indent=2, ensure_ascii=False, allow_nan=False) + '\n')
+    Path(path).write_text(json.dumps(value, indent=2, ensure_ascii=False, allow_nan=False) + '\n', encoding='utf-8')
 
 
 def read_json(path):
-    return json.loads(Path(path).read_text())
+    return json.loads(Path(path).read_text(encoding='utf-8'))
 
 
 def file_sha256(path):

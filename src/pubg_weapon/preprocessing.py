@@ -84,7 +84,7 @@ def build_history(frame):
     return aligned
 
 
-def clean_events(frame, mapping):
+def clean_events(frame, mapping, *, allow_empty=False):
     missing = set(RAW_COLUMNS) - set(frame.columns)
     if missing:
         raise ValueError(f'Missing columns: {sorted(missing)}')
@@ -118,10 +118,10 @@ def clean_events(frame, mapping):
            ~frame['map'].isin(['ERANGEL', 'MIRAMAR']))
     frame['weapon_group'] = frame.killed_by.map(mapping)
     remove('environment_or_unknown_weapon', frame.weapon_group.isna())
-    if frame.empty:
+    if frame.empty and not allow_empty:
         raise ValueError('No valid weapon events remain after cleaning')
     audit = pd.DataFrame(audit)
-    audit['fraction_of_input'] = audit.removed / audit.before.iloc[0]
+    audit['fraction_of_input'] = audit.removed / max(1, audit.before.iloc[0])
     return frame.reset_index(drop=True), audit
 
 
