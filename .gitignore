@@ -25,24 +25,19 @@ coverage.xml
 build/
 dist/
 
-# Local-only project folders (requested)
+# Local course material, reports and experiment output
+/docs/
+/reports/
 /artifacts/
 /kaggle/
 /tests/
 
-# Data generated or supplied locally
-data/raw/*
-!data/raw/.gitkeep
-data/interim/*
-!data/interim/.gitkeep
-data/processed/*
-!data/processed/.gitkeep
+# Dataset inputs and intermediate files
+/data/
 
 # Scratch output, handoff notes and generated report bundles
 /tmp/
 /handoff-session.md
-/reports/*.zip
-/reports/bao_cao_assets/muc_luc.json
 
 # OS and editor temporary files
 .DS_Store

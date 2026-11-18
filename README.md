@@ -14,7 +14,7 @@ python scripts/03_models.py --processed data/processed/run01 --output artifacts/
 python scripts/05_diagnostics.py --processed data/processed/run01 --run artifacts/run01 --output reports/run01-validation
 ```
 
-Mỗi thư mục đầu ra phải có tên mới. Để huấn luyện đầy đủ, đặt `--matches 50000`, `--max-train-rows 1000000` và bỏ `--quick`.
+Mỗi lượt chạy dùng một tên thư mục đầu ra mới. Các script tự tạo thư mục đầu ra và thư mục cha khi cần. Để huấn luyện đầy đủ, đặt `--matches 50000`, `--max-train-rows 1000000` và bỏ `--quick`.
 
 Sau khi khóa lựa chọn mô hình theo Macro-F1 trên validation, có thể chạy đánh giá tập kiểm tra một lần cho lượt huấn luyện đó.
 
@@ -22,4 +22,4 @@ Sau khi khóa lựa chọn mô hình theo Macro-F1 trên validation, có thể c
 python scripts/04_evaluation.py --processed data/processed/run01 --run artifacts/run01 --output reports/run01-test --jobs 2
 ```
 
-Các script `build_kaggle.py` và `build_appendix_kaggle.py` phục vụ quy trình đóng gói cũ và cần thêm bộ runner cục bộ. Notebook sử dụng trực tiếp các bước thực nghiệm ở trên.
+Notebook gọi trực tiếp các script từ `01_eda.py` đến `04_evaluation.py`. `05_diagnostics.py` phân tích validation. `06_rf_regularization.py` và `07_appendix.py` chạy các thí nghiệm bổ sung trong báo cáo.
