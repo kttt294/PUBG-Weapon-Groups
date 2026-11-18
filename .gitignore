@@ -1,0 +1,54 @@
+# Local environment and credentials
+.venv/
+.env
+.env.*
+!.env.example
+!.env.sample
+credentials*.json
+secrets*.json
+*.pem
+*.key
+*.token
+
+# Python and tool caches
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+build/
+dist/
+
+# Local-only project folders (requested)
+/artifacts/
+/kaggle/
+/tests/
+
+# Data generated or supplied locally
+data/raw/*
+!data/raw/.gitkeep
+data/interim/*
+!data/interim/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+
+# Scratch output, handoff notes and generated report bundles
+/tmp/
+/handoff-session.md
+/reports/*.zip
+/reports/bao_cao_assets/muc_luc.json
+
+# OS and editor temporary files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+/handoff_session.md
+/plan.md
