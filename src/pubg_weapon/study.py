@@ -22,14 +22,19 @@ def run(source, output, config):
                'packages': {d.metadata['Name']: d.version for d in distributions() if d.metadata['Name']},
                'started_utc': datetime.now(timezone.utc).isoformat()})
     try:
-        from .modern import preflight, run_modern
         from .full_data import prepare_full
         from .study_data import benchmark_cohorts, summarize_train
         from .study_diagnostics import error_profiles, resource_comparison
         from .study_training import run_study_training
         from .resources import measure
         stages = {}
-        preflight(config, output)
+        subprocess.run([
+            sys.executable, '-u', '-c',
+            'import sys; from pubg_weapon.modern import preflight; from pubg_weapon.io import read_json; '
+            'preflight(read_json(sys.argv[1]), sys.argv[2])',
+            str(output.resolve() / 'study_config.json'), str(output.resolve()),
+        ], check=True)
+        print('Official-model GPU preflight completed in an isolated process.', flush=True)
         prepared = output / 'prepared'
         prepare_full(source, prepared, partitions=config['partitions'], chunk_size=config['chunk_rows'], workers=config['workers'])
         with measure(stages, 'train_summary', output):
@@ -43,6 +48,7 @@ def run(source, output, config):
             run_study_training(prepared, full_output, {**config, 'seed': seed})
             with measure(stages, f'error_analysis_{seed}', output):
                 error_profiles(prepared, full_output, output / 'diagnostics' / str(seed), config['jobs'])
+        from .modern import run_modern
         run_modern(cohorts, output / 'modern_comparison', config)
         write_json(output / 'extra_resources.json', stages)
         from .study_report import build_deliverables

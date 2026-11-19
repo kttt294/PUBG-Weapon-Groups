@@ -2,7 +2,7 @@
   "jobs": 2,
   "workers": 2,
   "partitions": 128,
-  "chunk_rows": 400000,
+  "chunk_rows": 200000,
   "sgd_epochs": 5,
   "sgd_patience": 2,
   "xgb_rounds": 120,
