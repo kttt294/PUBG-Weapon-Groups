@@ -1,0 +1,20 @@
+{
+  "jobs": 2,
+  "workers": 2,
+  "partitions": 128,
+  "chunk_rows": 400000,
+  "sgd_epochs": 5,
+  "sgd_patience": 2,
+  "xgb_rounds": 120,
+  "xgb_patience": 20,
+  "bootstrap_repeats": 1000,
+  "benchmark_matches": {"train": 400, "validation": 100, "test": 150},
+  "benchmark_max_rows": 40000,
+  "seeds": [42, 2026, 7],
+  "tabm_epochs": 150,
+  "tabm_patience": 15,
+  "tabm_batch_rows": 256,
+  "tabicl_checkpoint": "tabicl-classifier-v2-20260212.ckpt",
+  "tabicl_estimators": 4,
+  "require_gpu": true
+}

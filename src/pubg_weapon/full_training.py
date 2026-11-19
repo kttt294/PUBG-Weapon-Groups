@@ -11,6 +11,7 @@ import xgboost as xgb
 from sklearn.linear_model import SGDClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.preprocessing import StandardScaler
+from scipy.special import expit, log_expit, softmax
 from threadpoolctl import threadpool_limits
 
 from .bootstrap import bootstrap_from_counts, paired_difference
@@ -100,9 +101,20 @@ class Variant:
             probability = np.zeros((len(raw), n_classes), dtype=np.float32)
             probability[:, self.model] = 1
             return probability
-        if self.family == 'xgboost':
+        if self.family.startswith('xgboost'):
             return self.model.inplace_predict(raw)
+        if self.family.startswith('sgd'):
+            return sgd_probabilities(self.model, scaled[:, :encoded_width])
         return self.model.predict_proba(scaled[:, :encoded_width])
+
+
+def sgd_probabilities(model, values):
+    decision = model.decision_function(values)
+    if decision.ndim == 1:
+        positive = expit(decision)
+        return np.column_stack([1-positive, positive])
+    # Normalize one-vs-rest sigmoids in log space when all scores are very negative.
+    return softmax(log_expit(decision), axis=1)
 
 
 def scores(matrix, top_two):

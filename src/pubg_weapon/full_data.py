@@ -12,7 +12,7 @@ import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-from .config import MIN_CLASS_FRACTION, ROOT, SEED
+from .config import MIN_CLASS_FRACTION, ROOT, SEED, RAW_COLUMNS
 from .io import new_directory, read_chunks, write_json
 from .preprocessing import OTHER, build_features, clean_events, load_mapping, merge_rare
 from .resources import measure
@@ -30,13 +30,19 @@ def save_frame(frame, path, writers, stack):
 
 def partition_sources(sources, output, partitions, chunk_size):
     match_ids, previous_source_ids, files, causes = set(), set(), [], Counter()
+    from .study_data import raw_quality
+    quality = None
     with ExitStack() as stack:
         writers = {}
         for source in sources:
             rows = 0
             first_source = source.name == 'kill_match_stats_final_0.csv'
-            for frame in read_chunks(source, chunk_size):
+            for frame in read_chunks(source, chunk_size, coerce_numeric=False):
                 rows += len(frame)
+                current_quality = raw_quality(frame)
+                quality = current_quality if quality is None else quality.add(current_quality)
+                for col in set(RAW_COLUMNS) - {'killed_by', 'killer_name', 'victim_name', 'map', 'match_id'}:
+                    frame[col] = pd.to_numeric(frame[col], errors='coerce').astype('float64')
                 ids = frame.match_id.str.strip()
                 distinct = set(ids.dropna().unique()) - {''}
                 match_ids.update(distinct)
@@ -48,6 +54,8 @@ def partition_sources(sources, output, partitions, chunk_size):
                     save_frame(part, output / f'{bucket:04d}.parquet', writers, stack)
             files.append({'name': source.name, 'bytes': source.stat().st_size, 'rows': rows})
             print(f'Đọc xong {source.name}: {rows:,} dòng', flush=True)
+    quality['missing_fraction'] = quality.missing / quality.rows
+    quality.to_csv(output.parent / 'raw_column_quality.csv')
     return match_ids, previous_source_ids, files, causes
 
 

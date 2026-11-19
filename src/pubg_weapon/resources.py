@@ -3,6 +3,7 @@ from contextlib import contextmanager
 import shutil
 from threading import Event, Thread
 import time
+import sys
 
 import psutil
 
@@ -18,6 +19,11 @@ def measure(stages, name, directory):
     peak_rss = 0
     min_free_disk = start_free_disk
     initial_cpu = process.cpu_times()
+    torch = sys.modules.get('torch')
+    use_gpu = torch is not None and torch.cuda.is_available()
+    if use_gpu:
+        torch.cuda.synchronize()
+        torch.cuda.reset_peak_memory_stats()
 
     def sample():
         nonlocal peak_rss, min_free_disk
@@ -44,6 +50,9 @@ def measure(stages, name, directory):
         watcher.join()
         sample()
         duration = time.perf_counter() - started
+        if use_gpu:
+            torch.cuda.synchronize()
+            duration = time.perf_counter() - started
         final_cpu = process.cpu_times()
         stages[name] = {
             'wall_seconds': round(duration, 3),
@@ -52,5 +61,6 @@ def measure(stages, name, directory):
             'minimum_volume_free_mib': round(min_free_disk / MIB, 1),
             'main_process_cpu_seconds': round(final_cpu.user + final_cpu.system
                                               - initial_cpu.user - initial_cpu.system, 3),
+            'gpu_peak_allocated_mib': round(torch.cuda.max_memory_allocated() / MIB, 1) if use_gpu else None,
         }
         print(f'{name}: {duration:.1f}s, RAM đỉnh {peak_rss / MIB:,.0f} MiB', flush=True)

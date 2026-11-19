@@ -35,13 +35,14 @@ def new_directory(path):
     return path
 
 
-def read_chunks(source, chunk_size=CHUNK_SIZE):
+def read_chunks(source, chunk_size=CHUNK_SIZE, coerce_numeric=True):
     if chunk_size < 1:
         raise ValueError('chunk_size must be positive')
     for frame in pd.read_csv(source, usecols=list(RAW_COLUMNS), chunksize=chunk_size,
                              dtype={c: 'string' for c in TEXT_COLUMNS}):
-        for col in set(RAW_COLUMNS) - set(TEXT_COLUMNS):
-            frame[col] = pd.to_numeric(frame[col], errors='coerce').astype('float64')
+        if coerce_numeric:
+            for col in set(RAW_COLUMNS) - set(TEXT_COLUMNS):
+                frame[col] = pd.to_numeric(frame[col], errors='coerce').astype('float64')
         yield frame.loc[:, list(RAW_COLUMNS)]
 
 
