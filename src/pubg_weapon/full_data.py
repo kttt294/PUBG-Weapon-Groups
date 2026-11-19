@@ -35,6 +35,7 @@ def partition_sources(sources, output, partitions, chunk_size):
     with ExitStack() as stack:
         writers = {}
         for source in sources:
+            print(f'Scan starting: {source.name}', flush=True)
             rows = 0
             first_source = source.name == 'kill_match_stats_final_0.csv'
             for frame in read_chunks(source, chunk_size, coerce_numeric=False):
@@ -52,6 +53,10 @@ def partition_sources(sources, output, partitions, chunk_size):
                 buckets = pd.util.hash_pandas_object(ids, index=False).to_numpy() % partitions
                 for bucket, part in frame.groupby(buckets, sort=False):
                     save_frame(part, output / f'{bucket:04d}.parquet', writers, stack)
+                if rows % (5 * chunk_size) == 0:
+                    import psutil
+                    print(f'Scan progress: {source.name} {rows:,} rows, '
+                          f'RSS {psutil.Process().memory_info().rss / 1024**2:.0f} MiB', flush=True)
             files.append({'name': source.name, 'bytes': source.stat().st_size, 'rows': rows})
             print(f'Đọc xong {source.name}: {rows:,} dòng', flush=True)
     quality['missing_fraction'] = quality.missing / quality.rows

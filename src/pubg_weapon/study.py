@@ -1,5 +1,6 @@
 """One notebook entry point for the complete coursework experiment."""
 import argparse
+import faulthandler
 from datetime import datetime, timezone
 from importlib.metadata import distributions
 import platform
@@ -13,6 +14,7 @@ from .io import file_sha256, new_directory, read_json, write_json
 
 
 def run(source, output, config):
+    faulthandler.enable(all_threads=True)
     output = new_directory(output)
     write_json(output / 'study_config.json', config)
     commit = subprocess.run(['git', '-C', str(ROOT), 'rev-parse', 'HEAD'],
