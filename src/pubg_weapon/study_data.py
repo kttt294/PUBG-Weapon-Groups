@@ -32,11 +32,16 @@ def raw_quality(frame):
         values = frame[col]
         missing = values.isna()
         blank = values.astype('string').str.strip().eq('').fillna(False)
-        numeric = pd.to_numeric(values, errors='coerce')
         is_number = col not in ('killed_by', 'killer_name', 'victim_name', 'map', 'match_id')
+        invalid_number = infinite = 0
+        if is_number:
+            # Audit numeric fields only; names and identifiers remain text.
+            numeric = pd.to_numeric(values.to_numpy(dtype=object, na_value=np.nan), errors='coerce')
+            invalid_number = int((pd.isna(numeric) & ~missing.to_numpy()).sum())
+            infinite = int(np.isinf(numeric).sum())
         result.append({'column': col, 'rows': len(frame), 'missing': int(missing.sum()),
-                       'blank': int(blank.sum()), 'invalid_number': int((numeric.isna() & ~missing).sum()) if is_number else 0,
-                       'infinite': int(np.isinf(numeric).sum()) if is_number else 0})
+                       'blank': int(blank.sum()), 'invalid_number': invalid_number,
+                       'infinite': infinite})
     return pd.DataFrame(result).set_index('column')
 
 
