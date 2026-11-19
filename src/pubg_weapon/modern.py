@@ -264,11 +264,12 @@ def run_modern(cohorts, output, config):
         pd.DataFrame(selections).to_csv(output / 'tuning.csv', index=False)
         write_json(output / 'resources.json', timing)
     results = pd.DataFrame(all_metrics)
-    results.groupby('name')[['macro_f1', 'accuracy', 'fit_seconds', 'predict_seconds']].agg(['mean', 'std']).to_csv(output / 'seed_summary.csv')
+    results[['seed', 'name', 'macro_f1', 'macro_f1_ci95_low', 'macro_f1_ci95_high',
+             'accuracy', 'fit_seconds', 'predict_seconds']].to_csv(output / 'seed_summary.csv', index=False)
     write_json(output / 'protocol.json', {'cohorts': read_json(cohorts / 'manifest.json'),
                'methods': list(test_predictions), 'natural_class_distribution': True, 'class_weights': False,
                'selection': 'validation Macro-F1 within each seed', 'test': 'same cohort for all families within a seed',
                'pretrained_model': config['tabicl_checkpoint'], 'pretraining_cost_included': False,
                'tabm_variant': 'TabM without feature embeddings, k=16, 3 blocks, width 256',
-               'seed_std': 'Training/inference randomness on the same fixed cohorts. Three-seed standard deviation is descriptive, not a confidence interval.',
+               'uncertainty': 'One model seed (42). CI95 uses match-level bootstrap of fixed predictions; training-seed variation is not measured.',
                'checkpoint_download_in_preflight': True})

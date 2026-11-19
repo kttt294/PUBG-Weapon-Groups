@@ -64,11 +64,11 @@ def number(value):
 
 def result_table(frame, name_column):
     rows = [r"\begin{tabular}{lrrr}", r"\toprule",
-            r"Phương pháp & Macro-F1 & SD & Accuracy\\", r"\midrule"]
+            r"Phương pháp & Macro-F1 & CI 95\% & Accuracy\\", r"\midrule"]
     for _, row in frame.iterrows():
         name = NAMES.get(row[name_column], row[name_column])
         rows.append(f"{tex(name)} & {decimal(row['macro_f1_mean'])} & "
-                    f"{decimal(row['macro_f1_std'])} & {decimal(row['accuracy_mean'])}" + r"\\")
+                    f"[{decimal(row['macro_f1_ci95_low'])}; {decimal(row['macro_f1_ci95_high'])}] & {decimal(row['accuracy_mean'])}" + r"\\")
     rows += [r"\bottomrule", r"\end{tabular}"]
     return "\n".join(rows)
 
@@ -87,7 +87,7 @@ def build(root, out):
     first_seed = config["seeds"][0]
     ablation = pd.concat([pd.read_csv(root / "full_models" / str(seed) / "test" / "ablation.csv")
                           for seed in config["seeds"]])
-    ablation = ablation.groupby("ablation").macro_f1.agg(["mean", "std"]).reset_index()
+    ablation = ablation[['ablation', 'macro_f1', 'macro_f1_ci95_low', 'macro_f1_ci95_high']]
     models = pd.read_csv(root / "full_test_selected_by_family.csv")
     winner = models.groupby("family").validation_macro_f1.mean().idxmax()
     split_rows = []
@@ -175,12 +175,12 @@ def build(root, out):
         + r"\vspace{3mm}\nhanmanh{Thời gian fit trên PUBG không gồm chi phí tiền huấn luyện.}",
         "Giải thích in-context learning bằng ví dụ mô hình nhận các hàng có nhãn và một hàng truy vấn. TabICLv2 không học các epoch gradient từ PUBG như TabM. Nêu nhu cầu bộ nhớ ngữ cảnh và lý do so sánh trên cùng các hàng có giới hạn kích thước.",
         "Qu và cộng sự, TabICLv2, ICML 2026")
-    add("3.5. Ba seed và hai quy mô thí nghiệm",
+    add("3.5. Một seed và hai quy mô thí nghiệm",
         bullets("Toàn train: mọi dòng hợp lệ, cùng một cách chia dữ liệu.",
                 "Bộ so sánh phương pháp mới: tất cả họ dùng cùng hàng và phân bố lớp.",
-                "Seed mô hình 42, 2026, 7. Tham số và epoch chọn bằng validation.",
+                "Seed mô hình 42. Tham số và epoch chọn bằng validation.",
                 "Macro-F1 là chỉ số chính, kèm Accuracy, từng lớp và chi phí.")
-        + r"\vspace{2mm}{\small SD ba seed mô tả biến thiên mô hình. Khoảng tin cậy tính riêng bằng bootstrap theo trận.}",
+        + r"\vspace{2mm}{\small CI 95\% dùng bootstrap theo trận. Chưa đo độ ổn định giữa các seed huấn luyện.}",
         "Làm rõ lý do không đặt điểm của hai quy mô vào một bảng xếp hạng chung. Trong từng bảng, cách chia và dữ liệu của các mô hình tương ứng là chung. Bootstrap lấy lại nguyên trận để giữ phụ thuộc giữa các sự kiện.")
     add("4.1. Kết quả trên toàn bộ dữ liệu huấn luyện",
         r"\begin{center}" + result_table(full, "family") + r"\end{center}\vspace{3mm}"
@@ -188,11 +188,11 @@ def build(root, out):
         "Đọc hai chênh lệch quan trọng trong bảng dựa trên số liệu thật, sau đó giải thích sự đánh đổi giữa Macro-F1 và Accuracy. Không dùng Accuracy riêng để kết luận khả năng nhận diện lớp ít mẫu.")
     add("4.2. TabM và TabICLv2 so với các đối chứng",
         r"\begin{center}{\small " + result_table(modern, "name") + r"}\end{center}",
-        "Nêu thứ hạng và độ lệch chuẩn của hai phương pháp mới, rồi đối chiếu với XGBoost và Random Forest trên cùng dữ liệu. Chỉ khẳng định chênh lệch rõ khi bảng bootstrap trong báo cáo hỗ trợ. Giải thích nếu phương pháp mới chưa tốt hơn đối chứng.",
+        "Nêu thứ hạng và CI bootstrap của hai phương pháp mới, rồi đối chiếu với XGBoost và Random Forest trên cùng dữ liệu. Chỉ khẳng định chênh lệch rõ khi bảng bootstrap trong báo cáo hỗ trợ. Giải thích nếu phương pháp mới chưa tốt hơn đối chứng.",
         "Cùng các trận và hàng trong comparison_cohorts")
     add("4.3. Nhóm đặc trưng nào cải thiện dự đoán?",
-        r"\begin{center}\begin{tabular}{lrr}\toprule Mức & Macro-F1 trung bình & SD\\\midrule"
-        + "\n".join(f"{r.ablation} & {decimal(r.mean)} & {decimal(r.std)}" + r"\\" for r in ablation.itertuples())
+        r"\begin{center}\begin{tabular}{lrr}\toprule Mức & Macro-F1 & CI 95\%\\\midrule"
+        + "\n".join(f"{r.ablation} & {decimal(r.macro_f1)} & [{decimal(r.macro_f1_ci95_low)}; {decimal(r.macro_f1_ci95_high)}]" + r"\\" for r in ablation.itertuples())
         + r"\bottomrule\end{tabular}\end{center}\vspace{3mm}"
         + r"\nhanmanh{Đọc tác động của lịch sử cùng kết quả nhóm chưa có lịch sử.}",
         "Nêu mức tăng từ C lên D bằng kết quả thật. Nhắc rằng thứ tự thêm đặc trưng ảnh hưởng chênh lệch. Lịch sử chỉ có tín hiệu khi tồn tại, nên báo cáo chia riêng nhóm đã có và chưa có sự kiện trước.")
@@ -211,7 +211,7 @@ def build(root, out):
         "Đọc thời gian và RAM từ bảng cuối báo cáo. Chỉ rõ công đoạn chậm nhất và công đoạn có đỉnh RAM cao nhất. Tránh suy ra hiệu suất CPU chỉ từ số luồng được đặt.")
     add("5. Kết luận và hướng phát triển",
         bullets("Đã xử lý nguồn lớn, tổ chức đặc trưng theo trận và thời gian.",
-                "Đối chiếu phương pháp cổ điển với TabM và TabICLv2 qua ba seed.",
+                "Đối chiếu phương pháp cổ điển với TabM và TabICLv2 với seed 42 và CI bootstrap.",
                 "Giới hạn từ lớp Other, lịch sử chưa có và dữ liệu trò chơi theo giai đoạn.",
                 "Hướng phát triển: đánh giá theo thời gian, người chơi và chuỗi dùng nhãn dự đoán.")
         + r"\vspace{3mm}\nhanmanh{Nguồn và kết quả đi kèm để kiểm chứng từng kết luận.}",
@@ -238,7 +238,7 @@ def build(root, out):
          "Trả lời dựa vào bảng thật, không viện dẫn danh tiếng phương pháp để phủ định số đo. Nêu các hướng tinh chỉnh trên validation có thể kiểm tra tiếp."),
         ("Dự phòng. Tái lập từ notebook",
          r"\texttt{python -m pubg\_weapon.study}\par\vspace{3mm}"
-         + bullets("Một notebook, nguồn cố định và năm CSV.", "Ba seed mô hình và cùng các trận đánh giá.",
+         + bullets("Một notebook, nguồn cố định và năm CSV.", "Một seed mô hình và CI bootstrap theo trận.",
                    "Bảng gốc, dự đoán, bootstrap và phiên bản môi trường được lưu."),
          "Mở phần notebook tương ứng nếu được hỏi. API key chỉ dùng gửi lệnh Kaggle từ máy local, không nằm trong notebook công khai."),
     ]

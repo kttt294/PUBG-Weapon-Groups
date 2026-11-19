@@ -8,9 +8,15 @@
   "xgb_rounds": 120,
   "xgb_patience": 20,
   "bootstrap_repeats": 1000,
-  "benchmark_matches": {"train": 400, "validation": 100, "test": 150},
+  "benchmark_matches": {
+    "train": 400,
+    "validation": 100,
+    "test": 150
+  },
   "benchmark_max_rows": 40000,
-  "seeds": [42, 2026, 7],
+  "seeds": [
+    42
+  ],
   "tabm_epochs": 150,
   "tabm_patience": 15,
   "tabm_batch_rows": 256,
