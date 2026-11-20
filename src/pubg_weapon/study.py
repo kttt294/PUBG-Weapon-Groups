@@ -53,14 +53,14 @@ def run(source, output, config):
         from .modern import run_modern
         run_modern(cohorts, output / 'modern_comparison', config)
         write_json(output / 'extra_resources.json', stages)
-        from .study_report import build_deliverables
-        build_deliverables(output)
+        from .study_results import export_results
+        export_results(output)
         # The complete source split and cohort definitions are retained for exact reproduction.
         files = [p for p in output.rglob('*') if p.is_file() and prepared not in p.parents]
         write_json(output / 'artifact_checksums.json', {p.relative_to(output).as_posix(): file_sha256(p) for p in files})
         write_json(output / 'status.json', {'status': 'completed', 'completed_utc': datetime.now(timezone.utc).isoformat(),
                    'models': ['TabM (ICLR 2025)', 'TabICLv2 (ICML 2026)'],
-                   'report_font_points': 12.5, 'repository': 'https://github.com/kttt294/PUBG-Weapon-Groups'})
+                   'repository': 'https://github.com/kttt294/PUBG-Weapon-Groups'})
     except Exception:
         (output / 'error.txt').write_text(traceback.format_exc(), encoding='utf-8')
         write_json(output / 'status.json', {'status': 'failed', 'error': traceback.format_exc()[-4000:]})

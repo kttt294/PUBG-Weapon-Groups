@@ -8,4 +8,7 @@ threadpoolctl>=3.1,<4
 xgboost-cpu==3.0.2
 psutil>=5.9,<8
 pytest>=8,<10
+tabm==0.0.3
+tabicl==2.2.0
+torch>=2.2,<3
 -e .

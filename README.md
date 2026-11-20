@@ -9,7 +9,7 @@ Dự án Khai phá dữ liệu phân loại nhóm vũ khí trong PUBG từ ngữ
 - [Slide PowerPoint](Thuyet_trinh_PUBG.pptx): bản tương thích từ PDF LaTeX, có speaker notes; nội dung từng trang là ảnh.
 - [Notebook thực nghiệm duy nhất](PUBG_Weapon_Groups.ipynb).
 
-Tài liệu sử dụng kết quả Kaggle version 7, mã nguồn `efab5bba6263ce5539d67407df37051b5bad9420`, một seed 42 và CI95% bootstrap theo trận 1.000 lần. Notebook giữ nguồn thực nghiệm này để tái lập; commit bàn giao tài liệu mới hơn không làm thay đổi nguồn đã chạy.
+Tài liệu sử dụng kết quả Kaggle version 7, mã nguồn `efab5bba6263ce5539d67407df37051b5bad9420`, một seed 42 và CI95% bootstrap theo trận 1.000 lần. Notebook đi kèm dùng cùng quy trình thực nghiệm và xuất bảng số liệu, biểu đồ để đối chiếu.
 
 ## Notebook chính và giao thức hiện tại
 
@@ -18,7 +18,7 @@ Mở `PUBG_Weapon_Groups.ipynb` trên Kaggle, gắn dataset `skihikingkevin/pubg
 Notebook chính gọi `python -m pubg_weapon.study` với năm tệp CSV. Quy trình xử lý toàn bộ nguồn và học trên mọi dòng train hợp lệ, với một seed mô hình 42 và một cách chia dữ liệu cố định. Các tham số có trong `configs/study.json`.
 
 ```bash
-python -m pip install -r requirements.txt -r requirements-modern.txt
+python -m pip install -r requirements.txt
 python -m pubg_weapon.study --source /path/to/deaths/kill_match_stats_final_{0,1,2,3,4}.csv --output artifacts/study
 ```
 
@@ -40,10 +40,10 @@ Tập holdout đã được đánh giá trong lượt trước và được gi�
 | `modern_comparison/` | Hai phương pháp mới, sáu đối chứng, dự đoán và thống kê với seed 42 và CI bootstrap |
 | `comparison_cohorts/` | Dữ liệu dùng chung và SHA-256 từng bộ |
 | `diagnostics/<seed>/` | Phân tích cự ly, nhóm nhãn và permutation importance |
-| `deliverables/` | Báo cáo PDF 12,5 pt, nguồn Markdown/LaTeX và PowerPoint |
+| `deliverables/` | Bảng kết quả CSV và biểu đồ PNG |
 | `source.zip`, `commit.txt`, `environment.json` | Mã nguồn thực tế, commit và môi trường |
 
-Chỉ khi tất cả công đoạn hoàn tất, `status.json` mới ghi `completed`. Khi lỗi, notebook vẫn giữ kết quả đã hoàn tất cùng thông báo để chẩn đoán. Mã nguồn LaTeX dùng XeLaTeX. Cỡ chữ 12,5 áp dụng cho chữ trong báo cáo PDF, kể cả bảng, bìa, số trang và mục lục.
+Chỉ khi tất cả công đoạn hoàn tất, `status.json` mới ghi `completed`. Khi lỗi, notebook vẫn giữ kết quả đã hoàn tất cùng thông báo để chẩn đoán.
 
 Tài liệu chính thức cho [TabM](https://github.com/yandex-research/tabm), [TabICLv2](https://proceedings.mlr.press/v306/qu26a.html) và [API TabICL](https://tabicl.readthedocs.io/en/latest/api.html).
 
