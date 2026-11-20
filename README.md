@@ -2,6 +2,15 @@
 
 Dự án Khai phá dữ liệu phân loại nhóm vũ khí trong PUBG từ ngữ cảnh của sự kiện hạ gục và lịch sử đã quan sát trong trận. GitHub dự án https://github.com/kttt294/PUBG-Weapon-Groups.
 
+## Tài liệu nộp và thuyết trình
+
+- [Báo cáo PDF](Bao_cao_PUBG.pdf): 44 trang, bảy chương và phụ lục.
+- [Slide PDF](Thuyet_trinh_PUBG.pdf): 16 slide chính và năm slide dự phòng.
+- [Slide PowerPoint](Thuyet_trinh_PUBG.pptx): bản tương thích từ PDF LaTeX, có speaker notes; nội dung từng trang là ảnh.
+- [Notebook thực nghiệm duy nhất](PUBG_Weapon_Groups.ipynb).
+
+Tài liệu sử dụng kết quả Kaggle version 7, mã nguồn `efab5bba6263ce5539d67407df37051b5bad9420`, một seed 42 và CI95% bootstrap theo trận 1.000 lần. Notebook giữ nguồn thực nghiệm này để tái lập; commit bàn giao tài liệu mới hơn không làm thay đổi nguồn đã chạy.
+
 ## Notebook chính và giao thức hiện tại
 
 Mở `PUBG_Weapon_Groups.ipynb` trên Kaggle, gắn dataset `skihikingkevin/pubg-match-deaths`, bật Internet và GPU T4 hoặc P100 rồi Run All. Notebook tải đúng commit và kiểm tra TabM, TabICLv2 trước khi quét dữ liệu. API key chỉ dùng trên máy gửi notebook lên Kaggle.
