@@ -26,7 +26,6 @@ build/
 dist/
 
 # Local course material, reports and experiment output
-/docs/
 /reports/
 /artifacts/
 /kaggle/
