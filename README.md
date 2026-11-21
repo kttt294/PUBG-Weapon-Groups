@@ -1,85 +1,84 @@
-# PUBG Weapon Groups
+# PUBG Weapon Groups: Phân loại Nhóm Vũ khí từ Ngữ cảnh và Lịch sử Sự kiện
 
-Dự án Khai phá dữ liệu phân loại nhóm vũ khí trong PUBG từ ngữ cảnh của sự kiện hạ gục và lịch sử đã quan sát trong trận. GitHub dự án https://github.com/kttt294/PUBG-Weapon-Groups.
+Dự án Khai phá dữ liệu lớn nhằm dự đoán **6 nhóm vũ khí trong PUBG** (`AR`, `SMG`, `Shotgun`, `Other`, `DMR`, `SR`) dựa trên ngữ cảnh không gian - thời gian và lịch sử hạ gục nội trận, xử lý trên toàn bộ hơn **65 triệu sự kiện giao tranh** từ 5 tệp CSV thô.
 
-## Tài liệu nộp và thuyết trình
+---
 
-- [Báo cáo PDF](Bao_cao_PUBG.pdf): 44 trang, bảy chương và phụ lục.
-- [Slide PDF](Thuyet_trinh_PUBG.pdf): 16 slide chính và năm slide dự phòng.
-- [Slide PowerPoint](Thuyet_trinh_PUBG.pptx): bản tương thích từ PDF LaTeX, có speaker notes; nội dung từng trang là ảnh.
-- [Notebook thực nghiệm duy nhất](PUBG_Weapon_Groups.ipynb).
+## 1. Tài liệu Dự án
 
-Tài liệu sử dụng kết quả Kaggle version 7, mã nguồn `efab5bba6263ce5539d67407df37051b5bad9420`, một seed 42 và CI95% bootstrap theo trận 1.000 lần. Notebook đi kèm dùng cùng quy trình thực nghiệm và xuất bảng số liệu, biểu đồ để đối chiếu.
+Tất cả báo cáo chi tiết và tài liệu thuyết trình được lưu trong thư mục `docs/`:
 
-## Notebook chính và giao thức hiện tại
+* [Báo cáo môn học hoàn chỉnh (PDF)](docs/Bao_cao_PUBG.pdf): 44 trang phân tích sâu về bài toán, kỹ thuật tiền xử lý, kiến trúc mô hình và chẩn đoán lỗi.
+* [Slide thuyết trình (PowerPoint .pptx)](docs/Thuyet_trinh_PUBG.pptx) & [Slide PDF](docs/Thuyet_trinh_PUBG.pdf): 21 slide trực quan kèm slide dự phòng phản biện.
+* [Cẩm nang câu hỏi ôn tập &amp; bảo vệ (PDF)](docs/Cam_nang_On_tap_Bao_ve_PUBG.pdf): Tổng hợp 33 câu hỏi - đáp chuyên sâu phục vụ bảo vệ đồ án.
 
-Mở `PUBG_Weapon_Groups.ipynb` trên Kaggle, gắn dataset `skihikingkevin/pubg-match-deaths`, bật Internet và GPU T4 hoặc P100 rồi Run All. Notebook tải đúng commit và kiểm tra TabM, TabICLv2 trước khi quét dữ liệu. API key chỉ dùng trên máy gửi notebook lên Kaggle.
+---
 
-Notebook chính gọi `python -m pubg_weapon.study` với năm tệp CSV. Quy trình xử lý toàn bộ nguồn và học trên mọi dòng train hợp lệ, với một seed mô hình 42 và một cách chia dữ liệu cố định. Các tham số có trong `configs/study.json`.
+## 2. Hướng dẫn Chạy & Tái lập Kết quả (Reproducibility)
 
-```bash
-python -m pip install -r requirements.txt
-python -m pubg_weapon.study --source /path/to/deaths/kill_match_stats_final_{0,1,2,3,4}.csv --output artifacts/study
-```
+### Cách 1: Chạy trực tiếp trên Kaggle (Khuyên dùng - Nhanh nhất)
 
-Lượt chính khảo sát alpha và epoch của Logistic SGD, hai mức chiều sâu và trọng số của XGBoost. Chọn cấu hình bằng validation, lưu đường học và đánh giá test theo trận. Kết quả của seed 42 cùng CI 95% bootstrap theo trận được giữ trong đầu ra.
+Toàn bộ quy trình thực nghiệm đã được đóng gói khép kín trong 1 notebook duy nhất trên Kaggle:
 
-TabM (ICLR 2025) và TabICLv2 (ICML 2026) cùng sáu đối chứng chạy trên một bộ dữ liệu chung gồm nguyên các trận, tối đa 40.000 dòng mỗi tập. Mọi phương pháp và seed trong bộ so sánh dùng cùng hàng, thứ tự hàng và phân bố tự nhiên. Các mô hình toàn train dùng mọi dòng hợp lệ của phần train nguồn. Bảng điểm ở hai quy mô cần diễn giải theo dữ liệu học tương ứng.
+**Kaggle Notebook:** [https://www.kaggle.com/code/kieuthithutrang/pubg-weapon-groups-reproduction](https://www.kaggle.com/code/kieuthithutrang/pubg-weapon-groups-reproduction)
 
-TabM dùng `tabm==0.0.3`, 16 thành viên, 3 khối, chiều rộng 256, không có feature embeddings. TabICLv2 dùng `tabicl==2.2.0`, checkpoint `tabicl-classifier-v2-20260212.ckpt`, 4 thành viên và representation cache. Chi phí tiền huấn luyện bên ngoài PUBG không nằm trong thời gian fit đo tại đây.
+**Các bước thực hiện:**
 
-Tập holdout đã được đánh giá trong lượt trước và được giữ cố định cho đánh giá lại theo giao thức này. Mọi lựa chọn tham số tiếp tục dựa vào validation. CI 95% dùng bootstrap theo trận với dự đoán cố định, chưa đánh giá độ ổn định giữa các seed huấn luyện.
+1. Mở liên kết notebook trên Kaggle và nhấn **Copy & Edit**.
+2. Tại bảng cấu hình bên phải:
+   * **Data:** Gắn bộ dữ liệu [PUBG Match Deaths and Statistics](https://www.kaggle.com/datasets/skihikingkevin/pubg-match-deaths).
+   * **Accelerator:** Chọn **GPU T4** hoặc **P100**.
+   * **Internet:** Bật **ON** (để tải thư viện TabM, TabICLv2 và clone code).
+3. Nhấn **Run All**. Notebook sẽ tự động tiền xử lý, huấn luyện cả 2 quy mô và xuất ra toàn bộ bảng biểu kết quả trong tệp nén `pubg_results_*.zip`.
 
-## Sản phẩm đầu ra
+---
 
-| Đường dẫn trong kết quả | Nội dung |
-|---|---|
-| `prepared/` | Kiểm kê nguồn và định nghĩa chia tập, các CSV/JSON được xuất cùng gói |
-| `eda/` | Thống kê toàn train, chất lượng từng cột và so sánh worker |
-| `full_models/<seed>/` | Mô hình toàn train, learning curve, chọn cấu hình và test |
-| `modern_comparison/` | Hai phương pháp mới, sáu đối chứng, dự đoán và thống kê với seed 42 và CI bootstrap |
-| `comparison_cohorts/` | Dữ liệu dùng chung và SHA-256 từng bộ |
-| `diagnostics/<seed>/` | Phân tích cự ly, nhóm nhãn và permutation importance |
-| `deliverables/` | Bảng kết quả CSV và biểu đồ PNG |
-| `source.zip`, `commit.txt`, `environment.json` | Mã nguồn thực tế, commit và môi trường |
+### Cách 2: Chạy trên máy cục bộ (Local Environment)
 
-Chỉ khi tất cả công đoạn hoàn tất, `status.json` mới ghi `completed`. Khi lỗi, notebook vẫn giữ kết quả đã hoàn tất cùng thông báo để chẩn đoán.
-
-Tài liệu chính thức cho [TabM](https://github.com/yandex-research/tabm), [TabICLv2](https://proceedings.mlr.press/v306/qu26a.html) và [API TabICL](https://tabicl.readthedocs.io/en/latest/api.html).
-
-## Các đường chạy của thực nghiệm trước
-
-Những lệnh bên dưới giữ các quy trình trước. Notebook chính ở trên thực hiện toàn bộ giao thức một seed cùng hai phương pháp gần đây.
-
-## Chạy thực nghiệm
-
-Lượt chính thức trên bộ đầy đủ dùng năm tệp CSV sự kiện tử vong trong thư mục `deaths/`. Mọi dòng thuộc cùng trận được đưa vào cùng phân vùng, kể cả khi xuất hiện ở nhiều tệp. Pipeline xử lý toàn bộ các phân vùng và dùng mọi dòng hợp lệ của tập train. Tập validation chọn mô hình, tập test đánh giá sau khi lựa chọn đã khóa.
+Yêu cầu môi trường Python 3.11 trở lên (khuyến nghị chạy trên Linux hoặc WSL):
 
 ```bash
-python -m pip install -r requirements.txt
-python scripts/08_full_data.py --source /path/to/deaths/kill_match_stats_final_{0,1,2,3,4}.csv --output artifacts/full --jobs 2
+# 1. Clone repository
+git clone https://github.com/kttt294/PUBG-Weapon-Groups.git
+cd PUBG-Weapon-Groups
+
+# 2. Cài đặt các thư viện phụ thuộc
+pip install -r requirements.txt
+
+# 3. Chạy pipeline thực nghiệm toàn diện (cả 5 CSV)
+python -m pubg_weapon.study \
+    --source /path/to/deaths/kill_match_stats_final_{0,1,2,3,4}.csv \
+    --output artifacts/study
 ```
 
-Lượt đầy đủ dùng Gaussian Naive Bayes và SGD Logistic theo lô, cùng XGBoost Hist với bộ nhớ ngoài trên CPU. Baseline dự đoán lớp phổ biến nhất. Kết quả nhóm đặc trưng A–D dùng cùng cấu hình SGD. Nhãn ngoài bảng ánh xạ được đếm trong `unmapped_causes.csv` và loại khỏi tập có nhãn. Tệp `dataset_manifest.json` ghi số dòng từng tệp, số dòng theo split và thời gian tiền xử lý.
+---
 
-### Quy trình lấy mẫu dùng trong thực nghiệm trước
+## 3. Bảng Kết quả Nổi bật
 
-Dùng Python 3.11 trở lên trên Linux hoặc Kaggle. Tải [PUBG Match Deaths and Statistics](https://www.kaggle.com/datasets/skihikingkevin/pubg-match-deaths) và lấy tệp `kill_match_stats_final_0.csv` trong thư mục `deaths`. Trên Kaggle, gắn bộ dữ liệu vào notebook và truyền đường dẫn tệp trong `/kaggle/input` cho `--source`.
+### Bảng 1: Kết quả trên Toàn bộ Dữ liệu Lớn (Tập Test: 6.972.742 dòng)
 
-```bash
-python -m pip install -r requirements.txt
-python scripts/01_eda.py --source /path/to/kill_match_stats_final_0.csv --output data/interim/run01 --matches 3000
-python scripts/02_preprocess.py --eda data/interim/run01 --output data/processed/run01 --max-train-rows 30000
-python scripts/03_models.py --processed data/processed/run01 --output artifacts/run01 --jobs 2 --quick
-python scripts/05_diagnostics.py --processed data/processed/run01 --run artifacts/run01 --output reports/run01-validation
-```
+*Áp dụng kỹ nghệ Out-of-Core trên máy chủ Kaggle RAM 16GB, đỉnh RAM chỉ tốn **4,34 – 4,49 GiB**.*
 
-Mỗi lượt chạy dùng một tên thư mục đầu ra mới. Các script tự tạo thư mục đầu ra và thư mục cha khi cần. Để huấn luyện đầy đủ, đặt `--matches 50000`, `--max-train-rows 1000000` và bỏ `--quick`.
+| Phương pháp                          | Macro-F1 (Độ đo chính) | Khoảng tin cậy 95% CI (Bootstrap) | Accuracy | Ghi chú kỹ thuật                                    |
+| :-------------------------------------- | :------------------------: | :---------------------------------: | :------: | :----------------------------------------------------- |
+| **Majority Baseline**             |           0,1149           |          [0,1148; 0,1150]          |  52,60%  | Mốc đoán mò lớp đa số (AR)                      |
+| **Gaussian Naive Bayes**          |           0,3192           |          [0,3187; 0,3196]          |  38,96%  | Học online theo lô `partial_fit()`                 |
+| **Logistic SGD**                  |           0,3954           |          [0,3949; 0,3958]          |  48,39%  | SGDClassifier, L2 penalty ($\alpha = 10^{-4}$)       |
+| **XGBoost Hist (Có trọng số)** |      **0,4040**      |     **[0,4036; 0,4045]**     |  45,34%  | **ExtMemQuantileDMatrix 64 bins, max_depth = 6** |
 
-Sau khi khóa lựa chọn mô hình theo Macro-F1 trên validation, có thể chạy đánh giá tập kiểm tra một lần cho lượt huấn luyện đó.
+---
 
-```bash
-python scripts/04_evaluation.py --processed data/processed/run01 --run artifacts/run01 --output reports/run01-test --jobs 2
-```
+### Bảng 2: Kết quả Benchmark Đối chứng SOTA (Tập Test: 9.780 dòng)
 
-Notebook gọi trực tiếp các script từ `01_eda.py` đến `04_evaluation.py`. `05_diagnostics.py` phân tích validation. `06_rf_regularization.py` và `07_appendix.py` chạy các thí nghiệm bổ sung trong báo cáo.
+*So sánh công bằng trên cùng dữ liệu lấy mẫu nguyên trận, giữ nguyên phân phối tự nhiên giữa các mô hình kinh điển và Deep Learning dữ liệu bảng mới nhất.*
+
+| Phương pháp                 |     Macro-F1     |  Khoảng tin cậy 95% CI  |     Accuracy     | Phân loại kiến trúc                                         |
+| :----------------------------- | :--------------: | :------------------------: | :--------------: | :-------------------------------------------------------------- |
+| **TabM**                 | **0,4140** | **[0,3984; 0,4281]** |      59,67%      | **Mạng MLP với BatchEnsemble (ICLR 2025) - Vô địch** |
+| **TabICLv2**             |      0,4094      |      [0,3938; 0,4235]      | **60,09%** | Tabular Foundation Model In-Context Learning (ICML 2026)        |
+| **Random Forest**        |      0,4020      |      [0,3869; 0,4163]      |      59,99%      | 300 cây, max_depth = 18, min_samples_leaf = 5                  |
+| **XGBoost Classifier**   |      0,4017      |      [0,3859; 0,4164]      |      59,68%      | Gradient Boosted Trees (max_depth = 6)                          |
+| **HistGradientBoosting** |      0,3980      |      [0,3825; 0,4129]      |      58,58%      | GBDT dựa trên Histogram của Scikit-learn                     |
+| **Logistic Regression**  |      0,3834      |      [0,3674; 0,3980]      |      58,80%      | Hồi quy Logistic chuẩn tắc                                   |
+| **Gaussian Naive Bayes** |      0,3259      |      [0,3138; 0,3381]      |      39,14%      | Xác suất Bayes độc lập                                     |
+| **Majority Baseline**    |      0,1146      |      [0,1126; 0,1167]      |      52,41%      | Mốc đoán lớp đa số                                        |
