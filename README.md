@@ -8,9 +8,8 @@ Dự án Khai phá dữ liệu lớn nhằm dự đoán **6 nhóm vũ khí trong
 
 Tất cả báo cáo chi tiết và tài liệu thuyết trình được lưu trong thư mục `docs/`:
 
-* [Báo cáo môn học hoàn chỉnh (PDF)](docs/Bao_cao_PUBG.pdf): 44 trang phân tích sâu về bài toán, kỹ thuật tiền xử lý, kiến trúc mô hình và chẩn đoán lỗi.
-* [Slide thuyết trình (PowerPoint .pptx)](docs/Thuyet_trinh_PUBG.pptx) & [Slide PDF](docs/Thuyet_trinh_PUBG.pdf): 21 slide trực quan kèm slide dự phòng phản biện.
-* [Cẩm nang câu hỏi ôn tập &amp; bảo vệ (PDF)](docs/Cam_nang_On_tap_Bao_ve_PUBG.pdf): Tổng hợp 33 câu hỏi - đáp chuyên sâu phục vụ bảo vệ đồ án.
+* [Báo cáo môn học hoàn chỉnh (PDF)](docs/Bao_cao_PUBG.pdf)
+* [Slide thuyết trình (PowerPoint .pptx)](docs/Thuyet_trinh_PUBG.pptx) & [Slide PDF](docs/Thuyet_trinh_PUBG.pdf)
 
 ---
 
